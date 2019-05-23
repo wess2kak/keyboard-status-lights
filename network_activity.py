@@ -1,5 +1,3 @@
-from time import sleep
-
 def get_network_activity(interface, type):
  interface_name_length = len(interface)
  with open('/proc/net/dev', 'r') as f:

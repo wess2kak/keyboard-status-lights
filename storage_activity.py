@@ -1,5 +1,3 @@
-from time import sleep
-
 def get_storage_activity(interface):
  storage_devices = []
  interface_present = False

@@ -12,7 +12,7 @@ def get_cpu_temps():
       if file.startswith('temp') and file.endswith('label'):
        with open('/sys/class/hwmon/' + directory + '/' + file, 'r') as f:
         if f.read().startswith('Core 0'):
-         file_to_read = '/sys/class/hwmon/hwmon0/' + file.split('_')[0] + '_input'
+         file_to_read = '/sys/class/hwmon/' + directory + '/' + file.split('_')[0] + '_input'
          break
  if not file_to_read:
   return print('Could not find temperature interfaces.')

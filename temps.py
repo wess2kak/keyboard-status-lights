@@ -6,8 +6,8 @@ def get_cpu_temps():
   return # i don't have a computer with this
  elif path.exists('/sys/class/hwmon/'):
   for directory in listdir('/sys/class/hwmon/'):
-   with open('/sys/class/hwmon/' + directory + '/name', 'r') as f:
-    if f.read().rstrip() == 'coretemp':
+   with open('/sys/class/hwmon/' + directory + '/name', 'r') as name_file:
+    if name_file.read().rstrip() == 'coretemp':
      for file in listdir('/sys/class/hwmon/' + directory):
       if file.startswith('temp') and file.endswith('label'):
        with open('/sys/class/hwmon/' + directory + '/' + file, 'r') as f:

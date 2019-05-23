@@ -26,7 +26,7 @@ def get_cpu_usage():
    active_time_delta = active_time_running - active_time_initial
    idle_time_delta = idle_time - idle_time_initial
    time_spent_working = active_time_delta - idle_time_delta
-   usage = ((time_spent_working / active_time_delta) * 100) if active_time_delta > 0 else 0
+   usage = ((time_spent_working / active_time_delta) * 100) if active_time_delta else 0
    yield usage
    active_time_initial = active_time_running
    idle_time_initial = idle_time

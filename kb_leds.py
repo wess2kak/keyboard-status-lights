@@ -24,10 +24,11 @@ def switch_led(index, state):
 
 devices_to_watch = {}
 for arg in argv[1:]:
- if arg[:3] == 'cpu':
+ if arg.startswith('cpu'):
   if '=' not in arg or not is_int(arg.split('=')[1]):
-   print(arg + 'requires a threshold integer in the format `cpu_usage=50`')
+   print(arg + ' requires a threshold integer in the format `cpu_usage=50`')
    exit()
+ if arg.startswith('storage'):
   current_arg = arg.split('=')[0]
  else:
   current_arg = arg
@@ -46,9 +47,9 @@ SLEEP_TIME = 1/30 # 30hz is about as fast as it can visibly blink
 
 # only import required generators
 for dev in devices_to_watch:
- if dev == 'storage':
+ if dev.startswith('storage'):
   from storage_activity import get_storage_activity
-  devices_to_watch[dev]['gen'] = get_storage_activity()
+  devices_to_watch[dev]['gen'] = get_storage_activity(dev.split('=')[1])
  elif dev.startswith('wireless') or dev.startswith('ethernet'):
   from network_activity import get_network_activity
   if dev.endswith('tx'):

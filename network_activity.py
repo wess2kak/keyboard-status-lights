@@ -8,7 +8,7 @@ def get_network_activity(interface, type):
    if line.split()[0][:2] == interface:
     interface_present = True
   if not interface_present:
-   print('Could not find interface: ' + interface)
+   return print('Could not find interface: ' + interface)
 
   rx_bytes = None
   tx_bytes = None

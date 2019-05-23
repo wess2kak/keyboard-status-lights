@@ -23,6 +23,7 @@ def switch_led(index, state):
   f.write(state)
 
 devices_to_watch = {}
+count = 0
 for arg in argv[1:]:
  if arg.startswith('cpu'):
   if '=' not in arg or not is_int(arg.split('=')[1]):
@@ -33,52 +34,49 @@ for arg in argv[1:]:
  else:
   current_arg = arg
  if current_arg in DEVICES:
-  devices_to_watch[arg.lower()] = {}
+  devices_to_watch[count] = {'name': arg.lower()}
+  count += 1
  else:
   print(arg + ' not a valid device!\nPossible devices include:\n ' + '\n '.join(DEVICES))
   exit()
- if len(devices_to_watch) >= 3:
+ if count >= 3:
   break # only accept up to 3 arguments
-
-print('watching', ', '.join(list(devices_to_watch.keys())))
 
 from time import sleep
 SLEEP_TIME = 1/30 # 30hz is about as fast as it can visibly blink
+print(devices_to_watch)
 
 # only import required generators
 for dev in devices_to_watch:
- if dev.startswith('storage'):
+ if devices_to_watch[dev]['name'].startswith('storage'):
   from storage_activity import get_storage_activity
-  devices_to_watch[dev]['gen'] = get_storage_activity(dev.split('=')[1])
- elif dev.startswith('wireless') or dev.startswith('ethernet'):
+  devices_to_watch[dev]['gen'] = get_storage_activity(devices_to_watch[dev]['name'].split('=')[1])
+ elif devices_to_watch[dev]['name'].startswith('wireless') or devices_to_watch[dev]['name'].startswith('ethernet'):
   from network_activity import get_network_activity
-  if dev.endswith('tx'):
-   devices_to_watch[dev]['gen'] = get_network_activity('wl' if dev.startswith('w') else 'en', 'tx')
+  if devices_to_watch[dev]['name'].endswith('tx'):
+   devices_to_watch[dev]['gen'] = get_network_activity('wl' if devices_to_watch[dev]['name'].startswith('w') else 'en', 'tx')
   else:
-   devices_to_watch[dev]['gen'] = get_network_activity('wl' if dev.startswith('w') else 'en', 'rx')
- elif dev.startswith('cpu_temps'):
+   devices_to_watch[dev]['gen'] = get_network_activity('wl' if devices_to_watch[dev]['name'].startswith('w') else 'en', 'rx')
+ elif devices_to_watch[dev]['name'].startswith('cpu_temps'):
   from temps import get_cpu_temps
   devices_to_watch[dev]['gen'] = get_cpu_temps()
- elif dev.startswith('cpu_usage'):
+ elif devices_to_watch[dev]['name'].startswith('cpu_usage'):
   from cpu_usage import get_cpu_usage
   devices_to_watch[dev]['gen'] = get_cpu_usage()
 
-indexed_devices = list(devices_to_watch.keys())
 #initialize device values
 for dev in devices_to_watch:
  devices_to_watch[dev]['value'] = next(devices_to_watch[dev]['gen'])
- devices_to_watch[dev]['state'] = '0'
-
+ devices_to_watch[dev]['state'] = '0' # off
 
 while True:
  for dev in devices_to_watch:
-  device_index = indexed_devices.index(dev)
   current_value = next(devices_to_watch[dev]['gen'])
   if devices_to_watch[dev]['value'] != current_value and devices_to_watch[dev]['state'] != '1':
-   switch_led(device_index, '1')
+   switch_led(dev, '1') # on
    devices_to_watch[dev]['state'] = '1'
    devices_to_watch[dev]['value'] = current_value
   elif devices_to_watch[dev]['state'] != '0':
-   switch_led(device_index, '0')
+   switch_led(dev, '0') # off
    devices_to_watch[dev]['state'] = '0'
  sleep(SLEEP_TIME)

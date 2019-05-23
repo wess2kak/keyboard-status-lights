@@ -3,7 +3,7 @@ Blink the keyboard status lights based on hardware device activity
 
 
 ## Usage
-`sudo ./kb_leds.py [list of devices separated by spaces]`
+`sudo ./kb_leds.py <list of devices separated by spaces>`
 
 Current devices available to monitor include:
 
